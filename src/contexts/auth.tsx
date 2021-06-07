@@ -2,17 +2,28 @@ import React, {createContext, useState, useContext, useEffect} from 'react';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as auth from '../services/auth';
+import { ToastAndroid } from 'react-native';
 
 interface User {
     email: string;
-    name: string;
+    nome: string;
+    avatar?: string;
+    fk_usuario_id?: number;
+}
+
+interface AuthenticateUser {
+    user: User;
+    token: string;
+    token_type: string;
+    expires_in: number;
 }
 
 interface AuthContextData {
     signed: boolean;
     loading: boolean;
+    loadingSignin: boolean;
     user: User | null; //Para evitar manutenções desnecessárias, é possível estabelecer um tipo objeto genérico
-    signIn(): Promise<void>;
+    signIn(email: string, password: string): Promise<void>;
     signOut(): void;
 }
 
@@ -22,6 +33,7 @@ export const AuthProvider: React.FC = ({children}) => {
 
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [loadingSignin, setLoadingSignin] = useState(false);
 
     useEffect(() => {
 
@@ -29,7 +41,9 @@ export const AuthProvider: React.FC = ({children}) => {
 
             const user = await AsyncStorage.getItem("@SGMAC:user");
             const token = await AsyncStorage.getItem("@SGMAC:token");
-    
+            
+            //console.log(user);
+
             if(user && token){
 
                 setUser(JSON.parse(user));
@@ -46,17 +60,45 @@ export const AuthProvider: React.FC = ({children}) => {
 
     }, []);
 
-    async function signIn() {
+    async function signIn(email: string, password: string) {
 
-        //Chamada a rota api para realizar login
-        const {token, user} = await auth.signIn();
+        //console.log("teste: ",email, password);
 
-        setUser(user);
+        if(!email || !password)
+            return;
+            
+        setLoadingSignin(true);
 
-        await AsyncStorage.setItem("@SGMAC:user", JSON.stringify(user));
-        await AsyncStorage.setItem("@SGMAC:token", token);
+        try{
 
-        api.defaults.headers.authorization = `Bearer ${token}`;
+            const response = await api.post<AuthenticateUser>('/signin', {email, password});
+
+            const {user, token} = response.data;
+
+            const userInfo = {
+                email: user.email,
+                nome: user.nome,
+                avatar: user.avatar,
+                fk_usuario_id: user.fk_usuario_id
+            };
+
+            //console.log(response.data);
+            
+            setUser(userInfo);
+
+            await AsyncStorage.setItem("@SGMAC:user", JSON.stringify(userInfo));
+            await AsyncStorage.setItem("@SGMAC:token", token);
+
+            api.defaults.headers.authorization = `Bearer ${token}`;
+   
+
+        }catch(error){
+            
+            ToastAndroid.show(`${error.response.data?.error}`, ToastAndroid.SHORT);
+        }finally{
+            setLoadingSignin(false);
+        }
+
 
     }
 
@@ -72,7 +114,7 @@ export const AuthProvider: React.FC = ({children}) => {
     para pasar o valor para signed, poderia ser Boolean(user) também*/
 
     return (
-    <AuthContext.Provider value={{signed: !!user, loading, user, signIn, signOut }}>
+    <AuthContext.Provider value={{signed: !!user, loading, loadingSignin, user, signIn, signOut }}>
         {children}
     </AuthContext.Provider>);
 };

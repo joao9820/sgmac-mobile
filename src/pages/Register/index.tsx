@@ -9,6 +9,7 @@ import Input from '../../components/Input';
 import { RectButton, TouchableOpacity } from 'react-native-gesture-handler';
 import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/core';
+import Header from '../../components/Header';
 
 const Login : React.FC = () => {
 
@@ -22,16 +23,14 @@ const Login : React.FC = () => {
    const navigation = useNavigation();
 
    const handleNavigateRegister = () => {
-       navigation.navigate('Register');
-   }
-
-   const handleNavigateForgetPassword = () =>{
-    navigation.navigate('ForgetPassword');
+       navigation.navigate('Home');
    }
 
     return (
         <View style={styles.container}>
-             <Image source={logo} style={styles.logotipo} />
+
+            <Header pageName="Cadastrar Paciente" previewScreen="Login" authPage/>
+
              <View style={styles.loginForm}>
              
                 <Input placeholder="E-mail" onChangeText={email => setEmail(email)}/>

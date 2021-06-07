@@ -1,15 +1,17 @@
 import React from 'react';
 import { Button, Text ,View } from 'react-native';
+import Header from '../../components/Header';
+import styles from './styles';
 import { useAuth } from '../../contexts/auth';
 
 const Home : React.FC = () => {
 
-    const {signOut, user} = useAuth();
+    const {user} = useAuth();
 
     return (
-        <View>
-            <Text>{user?.name}</Text>
-            <Button title='Logout' onPress={() => signOut()}/>
+        <View style={styles.container}>
+            <Header pageName="Página inicial"/>
+            <Text>{user?.nome}</Text>
         </View>
     );
 

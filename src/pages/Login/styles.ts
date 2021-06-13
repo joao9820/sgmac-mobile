@@ -2,26 +2,40 @@ import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
 
-    container: {
-        flex:1,
+    main:{
+        flex: 1,
         width: '100%',
-        padding: 16,
-        backgroundColor: "#00305E",
+        paddingVertical: 16,
+        backgroundColor: "#00305E"
+    },
+    container: {
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-evenly'
+        marginHorizontal: 16,
+    },
+    containerImg: {
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 250,
     },
     logotipo:{
         width: '80%',
-        height: '20%',
+        height: 120,
         resizeMode: 'contain',
     },
     loginForm: {
-        width: '100%',
+        width: '100%'
+    },
+    content: {
+        flex:1,
+        width:'100%',
+        alignItems: 'center',
         justifyContent: 'center',
     },
     buttonLogin:{
         marginTop: 12,
-        backgroundColor: '#0E89FC',
+        backgroundColor: '#3182CE',
         width: '100%',
         height: 45,
         borderRadius: 4,
@@ -37,8 +51,15 @@ const styles = StyleSheet.create({
     textLogin: {
         color: '#FFFFFF',
     },
+    footerLogin:{
+        width: '100%',
+        marginTop: 24,
+    },
     register: {
-        width: '100%'
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        marginTop: 28,
     },
     registerText: {
         fontSize: 14,
@@ -51,6 +72,7 @@ const styles = StyleSheet.create({
     },
     options: {
         width: '100%',
+        marginTop: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

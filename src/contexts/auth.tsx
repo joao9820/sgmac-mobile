@@ -2,7 +2,7 @@ import React, {createContext, useState, useContext, useEffect} from 'react';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as auth from '../services/auth';
-import { ToastAndroid } from 'react-native';
+import { Alert, ToastAndroid } from 'react-native';
 
 interface User {
     email: string;
@@ -93,8 +93,12 @@ export const AuthProvider: React.FC = ({children}) => {
    
 
         }catch(error){
+
+            Alert.alert(
+                'Login inválido',
+                `${error.response.data?.error}`,
+              );
             
-            ToastAndroid.show(`${error.response.data?.error}`, ToastAndroid.SHORT);
         }finally{
             setLoadingSignin(false);
         }

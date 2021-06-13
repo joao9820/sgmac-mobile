@@ -7,19 +7,16 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: '#CBD5E0', 
     },
-    logotipo:{
-        width: '80%',
-        height: '20%',
-        resizeMode: 'contain',
-    },
-    loginForm: {
-        padding: 16,
+    form: {
+        flex:1,
+        paddingVertical: 32,
+        paddingHorizontal: 8,
         width: '100%',
         justifyContent: 'center',
     },
     buttonLogin:{
         marginTop: 12,
-        backgroundColor: '#0E89FC',
+        backgroundColor: '#3182CE',
         width: '100%',
         height: 45,
         borderRadius: 4,
@@ -35,35 +32,13 @@ const styles = StyleSheet.create({
     textLogin: {
         color: '#FFFFFF',
     },
-    register: {
-        width: '100%'
+    containerError: {
+        marginBottom: 16,
     },
-    registerText: {
-        fontSize: 14,
-        color: '#E6E6F0',
-    },
-    registerLink: {
-        fontSize: 16,
-        textDecorationLine: 'underline',
-        color: '#0E89FC',
-    },
-    options: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingRight: 6,
-    },
-    rememberMe: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    rememberMeText: {
-        color: '#FFFFFF'
-    },
-    forgetPass: {
-        fontSize: 14,
-        color: '#0E89FC',
+    textError: {
+        color: "#c53030",
+        marginBottom: 4,
+        marginLeft: 4,
     }
 });
 

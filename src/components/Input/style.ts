@@ -12,13 +12,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F8FC',
         borderRadius: 5,
         color: '#6A6180',
-        padding: 16,
-    },
-    inputFocus: {
-        backgroundColor: '#FFFFFF',
         borderWidth: 2,
-        borderColor: '#3182CE',
-        borderRadius: 5,
+        padding: 16,
     },
     iconButton: {
         position: 'absolute',
@@ -35,13 +30,23 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     passButton: {
-        backgroundColor: '#00305E',
         width: 40,
         height: 40,
         borderRadius: 5,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 5
+    },
+    label: {
+        marginBottom: 4,
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#00305E'  
+    },
+    error: {
+        marginTop: 4,
+        color: '#E53E3E',
+        fontSize: 13,
     }
 });
 

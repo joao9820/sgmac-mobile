@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, Text, ActivityIndicator, Dimensions} from 'react-native';
+import { View, Image, Text, ActivityIndicator, Dimensions, TextInput} from 'react-native';
 import { useAuth } from '../../contexts/auth';
 
 import Button from '../../components/Button';
@@ -13,6 +13,7 @@ import Input from '../../components/Input';
 import { RectButton, TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/core';
+import { useRef } from 'react';
 
 const height = Dimensions.get('window');
 
@@ -25,10 +26,15 @@ const Login : React.FC = () => {
    const [rememberMe, setRememberMe] = useState(false);
    const [loading, setLoading] = useState(false);
 
+   const inputEmail = useRef<TextInput>(null);
+   const inputPassword = useRef<TextInput>(null);
+
    const navigation = useNavigation();
 
    const handleNavigateRegister = () => {
-       navigation.navigate('Register');
+       navigation.navigate('Register', {
+           isPacient: true
+       });
    }
 
    const handleNavigateForgetPassword = () =>{
@@ -39,7 +45,7 @@ const Login : React.FC = () => {
     email: Yup.string()
       .required('E-mail obrigatório')
       .email('Digite um e-mail válido!'),
-      senha: Yup.string().required('Senha obrigatória')
+      password: Yup.string().required('Senha obrigatória')
   });
 
     return (
@@ -49,21 +55,33 @@ const Login : React.FC = () => {
             <View style={styles.containerImg}>
                 <Image source={logo} style={styles.logotipo} />
              </View>
+             {/* Por padrão o formik toca em todos os inputs para que estes sejam validados, portanto não utilizaremos o onBlur event */}
              <Formik 
-             initialValues={{email: '', senha: ''}}
+             initialValues={{email: '', password: ''}}
              validationSchema={validationSignIn}
-                  onSubmit={values => signIn(values.email, values.senha)}>
-                      {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (<View style={styles.content}>
+                  onSubmit={values =>signIn(values.email, values.password)}>
+                      {({handleChange, handleSubmit, values, errors, touched}) => (<View style={styles.content}>
                 <View style={styles.loginForm}>
                 
-                    <Input placeholder="E-mail" value={values.email} 
+                    <Input placeholder="E-mail" value={values.email}
                     onChangeText={handleChange('email')}
-                    hasError={!!touched.email && !!errors.email} error={errors.email}  returnKeyType="next" />
+                    useTrim
+                    touched={touched.email}
+                    error={errors.email} 
+                    returnKeyType="next"
+                    ref={inputEmail}
+                    onSubmitEditing={() => inputPassword.current?.focus()}
+                    />
 
-                    <Input placeholder="Senha" hasError={!!touched.senha && !!errors.senha} error={errors.senha} value={values.senha} onChangeText={handleChange('senha')} 
-                    returnKeyType="send" pass />
+                    <Input placeholder="Senha" touched={touched.password}
+                    error={errors.password}  value={values.password}
+                    ref={inputPassword} 
+                    onChangeText={handleChange('password')} 
+                    returnKeyType="send" onSubmitEditing={() => handleSubmit()} pass />
                     
-                    <Button title="Entrar" onPress={handleSubmit} loading={loadingSignin} />
+                    <View style={styles.buttonLogin}>
+                        <Button title="Entrar"  onPress={handleSubmit} loading={loadingSignin} />
+                    </View>
                 </View>
                 <View style={styles.footerLogin}>
                     <View style={styles.options}>

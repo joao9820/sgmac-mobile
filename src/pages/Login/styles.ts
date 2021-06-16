@@ -35,15 +35,6 @@ const styles = StyleSheet.create({
     },
     buttonLogin:{
         marginTop: 12,
-        backgroundColor: '#3182CE',
-        width: '100%',
-        height: 45,
-        borderRadius: 4,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-
     },
     disabledButtonLogin:{
         backgroundColor: '#A0AEC0'

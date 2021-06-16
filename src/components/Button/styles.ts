@@ -2,7 +2,6 @@ import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
     button:{
-        marginTop: 12,
         width: '100%',
         height: 45,
         borderRadius: 4,

@@ -8,15 +8,17 @@ import styles from './style';
 import {Feather} from '@expo/vector-icons';
 import { color } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { boolean } from 'yup/lib/locale';
+import { useMemo } from 'react';
+import { RefObject, forwardRef } from 'react';
 
 interface Props extends TextInputProps {
     placeholder?: string;
     label ?: string;
     value?: string;
-    hasError?: boolean;
     error?: string;
+    touched?: boolean;
     onChangeText(text: string): void;
+    useTrim?: boolean;
     last?: boolean;
     pass?: boolean;
     mask?: 'none' | 'cpf'| 'decimal' | 'telefone';
@@ -32,7 +34,7 @@ interface InputFocus {
     
 }
 
-const Input : React.FC<Props> = ({placeholder, value, last, pass, onChangeText, label, hasError, error ,mask = 'none', ...rest}) => {
+const Input : React.ForwardRefRenderFunction<TextInput,Props> = ({placeholder ,value, last, pass, onChangeText, label, error, touched, useTrim = false ,mask = 'none',...rest}, ref) => {
 
     const [viewPass, setViewPass] = useState(false);
     const [focusStyle, setFocusStyle] = useState<InputFocus | null>({} as InputFocus);
@@ -43,6 +45,8 @@ const Input : React.FC<Props> = ({placeholder, value, last, pass, onChangeText, 
 
     const [active, setActive] = useState(false);
     const [borderColor, setBorderColor] = useState(defaultColor);
+
+    const hasError = useMemo(() => !!error && touched, [error, touched]);
 
     useEffect(() => {
         if(hasError)
@@ -84,14 +88,15 @@ const Input : React.FC<Props> = ({placeholder, value, last, pass, onChangeText, 
                 style={[styles.input, {borderColor: borderColor}]}
                 onFocus={() => {setActive(true); !hasError && setBorderColor(activeColor)}} 
                 onBlur={() => {setActive(false); !hasError && setBorderColor(defaultColor)}}
-                value={value} onChangeText={text => handleCustomText(text)} {...rest} />
-                {pass && (<View style={styles.iconButton}><BorderlessButton style={styles.passButton} onPress={handleViewPass}><Feather name={viewPass ? 'eye-off' : 'eye'}
+                value={value} onChangeText={text => handleCustomText(useTrim ? text.trim() : text)} ref={ref} {...rest} />
+                {pass && (<View style={styles.iconButton}><BorderlessButton style={styles.passButton} onPress={handleViewPass}>
+                    <Feather name={viewPass ? 'eye-off' : 'eye'}
                 color={borderColor} 
                 size={22} /></BorderlessButton></View>)}
             </View>
-            {hasError && !!error && (<Text style={styles.error}>{error}</Text>)}    
+            {hasError && (<Text style={styles.error}>{error}</Text>)}    
         </View>
     )
 }
 
-export default Input;
+export default forwardRef(Input);

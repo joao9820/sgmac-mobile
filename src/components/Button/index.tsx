@@ -2,6 +2,7 @@ import React from 'react';
 import { ActivityIndicator, ButtonProps, Text } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 
+
 import styles from './styles';
 
 interface Props extends ButtonProps {

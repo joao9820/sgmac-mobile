@@ -26,6 +26,7 @@ import { useEffect } from 'react';
 import { RouteProp } from '@react-navigation/native';
 import CustomPicker, {Option} from '../../components/CustomPicker';
 import { Formik } from 'formik';
+import { ObjectShape } from 'yup/lib/object';
 
 
 type CustomRouteProp = RouteProp<ParamList, 'Register'>;
@@ -149,7 +150,7 @@ const Register : React.FC<Props> = ({route}) => {
       cpf: Yup.string().required('CPF obrigatório').min(14, 'O CPF deve possuir no mínimo 11 digitos'),
       telefone1: Yup.string().required('Telefone obrigatório'),
       password: Yup.string().required('Senha obrigatória'),
-      password_confirmation: Yup.string().required('Necessário confirmar a senha')
+      password_confirmation: Yup.string().required('Necessário confirmar a senha'),
    }
 
    const validationDoctor = {
@@ -166,6 +167,10 @@ const Register : React.FC<Props> = ({route}) => {
    }
 
    useEffect(() => {
+    //Para acessar essa rota é necessário ter se autenticado, portanto no cadastro de paciente não buscamos as funções
+
+     if(isPacient)
+        return;
 
     api.get<Funcao[]>('/responsibilities').then((response) => {
 
@@ -173,7 +178,7 @@ const Register : React.FC<Props> = ({route}) => {
         return {
           id_funcao: funcao.id_funcao,
           nome: funcao.nome,
-          id: funcao.id_funcao,
+          id: String(funcao.id_funcao),
           name: funcao.nome
         }
       }));
@@ -278,6 +283,21 @@ const Register : React.FC<Props> = ({route}) => {
  */
    }
 
+  
+  function handleGetValidation(): ObjectShape {
+
+    if(isPacient || (!!funcao && Number(funcao) === 4))
+      return {...validationUser, ...validationPacient};
+
+      const funcaoValidation = {funcao: Yup.string().required('Necessário escolher uma função')}
+
+    if(funcao && Number(funcao) === 3)
+      return {...validationUser, ...validationDoctor, ...funcaoValidation}
+      
+    return {...validationUser,  ...funcaoValidation};
+
+  }
+
     return (
         <View style={styles.container}>
 
@@ -286,7 +306,7 @@ const Register : React.FC<Props> = ({route}) => {
                 <View style={styles.form}>
                 <Formik 
              initialValues={{...initialvalues, funcao: ''}}
-             validationSchema={ Yup.object().shape(validationUser)}
+             validationSchema={ Yup.object().shape(handleGetValidation())}
                   onSubmit={values => console.log('teste')}>
                       {({handleChange, handleSubmit, values, errors, touched}) => 
                       (
@@ -300,8 +320,9 @@ const Register : React.FC<Props> = ({route}) => {
                           options={funcoes} 
                           touched={touched.funcao} 
                           error={errors.funcao} 
-                          onChange={(value) => {handleChange('funcao'); setFuncao(value)}} 
-                          value={funcao}  />)}
+                          onChange={handleChange('funcao')}
+                          onChangeState={(value) => setFuncao(value)} 
+                          value={values.funcao}  />)}
 
       
                           <Input placeholder="Digite o seu nome" label="Nome" value={values.nome}
@@ -354,7 +375,7 @@ const Register : React.FC<Props> = ({route}) => {
                           touched={touched.password_confirmation} error={errors.password_confirmation} returnKeyType="next" ref={inputPasswordConfirmation}
                           onChangeText={handleChange('password_confirmation')} onSubmitEditing={() => inputPeso.current?.focus()} pass />
 
-                        {isPacient || (!!funcao && Number(funcao) === 4) && (
+                        {(isPacient || !!funcao && Number(funcao) === 4) && (
                           <>
                           <Input placeholder="Informe o seu peso" label="Peso" value={values.peso}
                             touched={touched.peso}

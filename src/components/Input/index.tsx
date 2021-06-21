@@ -69,7 +69,7 @@ const Input : React.ForwardRefRenderFunction<TextInput,Props> = ({placeholder ,v
 
 
         switch(mask){
-            case 'cpf': onChangeText(cpfMask(text));
+            case 'cpf': onChangeText(cpfMask(text.length <= 11 ? text : text.slice(0, 11) ));
             break;
             case 'telefone': onChangeText(telefoneMask(text));
             break;

@@ -14,15 +14,19 @@ export interface Option {
 interface Props {
     label: string;
     options: Option[];
+    placeholder?: string;
+    enabled?: boolean;
     value: string;
     error?: string;
     touched?: boolean;
     last?: boolean;
+    loading?: boolean;
     onChange(value: string): void;
     onChangeState?(value: string): void;
 }
 
-const CustomPicker : React.FC<Props> = ({label, options, value, error, touched, onChange,  onChangeState,last = false}) => {
+const CustomPicker : React.FC<Props> = ({label, options, value, enabled = true, error, touched, onChange, placeholder = 'Selecione',  
+onChangeState, loading = false, last = false}) => {
 
     const defaultColor = '#DFE1E6';
     const errorColor = '#E53E3E';
@@ -40,7 +44,7 @@ const CustomPicker : React.FC<Props> = ({label, options, value, error, touched, 
 
     return (
     <View style={[styles.container, {marginBottom: last ? 0 : 16 }]}>
-    <Text style={styles.label}>Função do usuário: </Text>
+    <Text style={styles.label}>{label}</Text>
         <View style={[styles.picker, {borderColor}]}>
           <Picker 
           selectedValue={value}
@@ -49,8 +53,9 @@ const CustomPicker : React.FC<Props> = ({label, options, value, error, touched, 
             height: '100%',
             color: '#6A6180'
           }}
+          enabled={!loading && enabled}
           >
-            <Picker.Item label="Selecione" value="" />
+            <Picker.Item label={loading ? 'Carregando...' : placeholder} value="" />
             {!!options.length && options.map((option) =><Picker.Item key={option.id} label={option.name} value={option.id} /> )}
           </Picker>
         </View>

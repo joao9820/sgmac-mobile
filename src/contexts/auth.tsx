@@ -45,10 +45,11 @@ export const AuthProvider: React.FC = ({children}) => {
             //console.log(user);
 
             if(user && token){
-
-                setUser(JSON.parse(user));
+                
                 //Todas as requisições conterão por padrão o token de autorização
                 api.defaults.headers.authorization = `Bearer ${token}`;
+
+                setUser(JSON.parse(user));
             }
 
             setLoading(false);
@@ -83,13 +84,13 @@ export const AuthProvider: React.FC = ({children}) => {
             };
 
             //console.log(response.data);
-            
-            setUser(userInfo);
 
             await AsyncStorage.setItem("@SGMAC:user", JSON.stringify(userInfo));
             await AsyncStorage.setItem("@SGMAC:token", token);
 
             api.defaults.headers.authorization = `Bearer ${token}`;
+
+            setUser(userInfo);
    
 
         }catch(error){
@@ -108,10 +109,18 @@ export const AuthProvider: React.FC = ({children}) => {
 
     function signOut() {
 
-      AsyncStorage.clear().then(() => {
-        setUser(null);
-      });
+        api.post('/signout').then(() => {
+            ToastAndroid.show("Deslogado com sucesso!", ToastAndroid.SHORT)
+
+        }).finally(() => {
+            AsyncStorage.clear().then(() => {
+                setUser(null);
+            });
+        });
        
+              
+     
+
     }
 
     /*os dois pontos de exclamação, transforma nosso objeto em um booleano (!!)

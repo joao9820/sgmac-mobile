@@ -5,6 +5,7 @@ import Users from '../pages/Users';
 import Register from '../pages/Register';
 
 import {Ionicons} from '@expo/vector-icons';
+import Solicitation from '../pages/Solicitation';
 
 const CustomNav = createBottomTabNavigator();
 
@@ -51,7 +52,7 @@ function AppRoutesTabs(){
         }} />
  */}
 
-        <CustomNav.Screen  name="Home" component={Home} options={{
+        <CustomNav.Screen  name="Solicitations" component={Solicitation} options={{
             tabBarLabel: 'Solicitações',
             tabBarIcon: ({color, size, focused}) => {
                 return (

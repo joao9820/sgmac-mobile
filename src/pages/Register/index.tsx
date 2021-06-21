@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 
 import {Feather} from '@expo/vector-icons';
 
-import logo from '../../assets/images/logoSub.png';
+//import logo from '../../assets/images/logoSub.png';
 import Input from '../../components/Input';
 import { RectButton, TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
 import CheckBox from '@react-native-community/checkbox';
@@ -40,6 +40,16 @@ interface Funcao extends Option {
   nome: string;
 }
 
+export interface UserDefault {
+  fk_funcao_id: number;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone1: string;
+  password: string;
+  password_confirmation: string;
+}
+
 interface Pacient extends UserDefault {
   peso: string;
   tamanho: string;
@@ -53,18 +63,9 @@ interface Doctor extends UserDefault {
   estabelecimento: string;
 }
 
-interface UserDefault {
-  fk_funcao_id: number;
-  nome: string;
-  email: string;
-  cpf: string;
-  telefone1: string;
-  password: string;
-  password_confirmation: string;
-}
-
 interface FormData {
-  fk_funcao_id: number;
+  fk_funcao_id?: number;
+  funcao?: string;
   nome: string;
   email: string;
   cpf: string;
@@ -102,6 +103,7 @@ const Register : React.FC<Props> = ({route}) => {
    const [telefone1, setTelefone1] = useState('');
    const [raca, setRaca] = useState('');
    const [loading, setLoading] = useState(false);
+   const [loadedFuncoes, setLoadedFuncoes] = useState(false);
    const [formErrors, setFormErrors]  = useState<Array<string>>([]);
 
    const navigation = useNavigation();
@@ -168,9 +170,10 @@ const Register : React.FC<Props> = ({route}) => {
 
    useEffect(() => {
     //Para acessar essa rota é necessário ter se autenticado, portanto no cadastro de paciente não buscamos as funções
-
      if(isPacient)
         return;
+
+      setLoadedFuncoes(false);
 
     api.get<Funcao[]>('/responsibilities').then((response) => {
 
@@ -182,6 +185,8 @@ const Register : React.FC<Props> = ({route}) => {
           name: funcao.nome
         }
       }));
+    }).finally(() => {
+      setLoadedFuncoes(true);
     });
   }, []);
 
@@ -189,11 +194,9 @@ const Register : React.FC<Props> = ({route}) => {
 
     
     setLoading(true);
-    setFormErrors([]);
+    //setFormErrors([]);
 
     try {
-   
-        const schema = Yup.object().shape(validationUser);
 
         const {nome, email, cpf, telefone1, password, password_confirmation} = data;
 
@@ -208,61 +211,61 @@ const Register : React.FC<Props> = ({route}) => {
 
         let user = {};
 
-        if(isPacient){
+        if(isPacient || (!!data?.funcao && Number(data?.funcao) === 4)){
           user = {
             ...userDefault,
             fk_funcao_id: 4,
-            peso: data.peso,
-            tamanho: data.tamanho,
-            nome_da_mae: data.nome_da_mae,
-            raca: data.raca,
+            complemento: {
+              peso: data.peso,
+              tamanho: data.tamanho,
+              nome_da_mae: data.nome_da_mae,
+              raca: data.raca,
+            }
           } 
         }else{
 
           if(funcao < 3 ){
-            user = {...userDefault, fk_funcao_id: Number(funcao)};
+            user = {...userDefault, fk_funcao_id: Number(data?.funcao)};
 
           }else{
             user = {
               ...userDefault,
-              fk_funcao_id: Number(funcao),
-              cns: data.cns,
-              cnes: data.cnes,
-              estabelecimento: data.estabelecimento
+              fk_funcao_id: Number(data?.funcao),
+              complemento: {
+                cns: data.cns,
+                cnes: data.cnes,
+                estabelecimento: data.estabelecimento
+              }
             }
           }
         }
 
-        
+        //console.log(data.telefone1);
 
         await api.post('/signon', user);
 
-        Alert.alert(
-          'cadastrado com sucesso!',
-          'Você já pode fazer seu login no SGMAC!',
-        );
+        let msg = '';
 
-        navigation.goBack();
-      } catch (err) {
-        if (err instanceof Yup.ValidationError) {
-          const errors = getValidationMessageErrors(err);
+        if(isPacient || (!!data?.funcao && Number(data?.funcao) === 4)){
+          
+          msg = 'Você já pode fazer seu login no SGMAC!';
 
-          setFormErrors(errors);
-
-          //errorsRef?.current?.focus();
-
-          //console.log(errors);
-          //formRef.current?.setErrors(errors);
-
-          return;
+          navigation.goBack();
+        }else{
+          msg =`O usuário ${data.nome} foi registrado no SGMAC`;
         }
 
-        //console.log(err.response.data);
 
         Alert.alert(
-          'Erro no cadastro',
-          'Ocorreu um erro ao fazer o cadastro, tente novamente.',
+          'Cadastrado com sucesso!',
+          msg,
         );
+          
+      } catch (err) {
+        //console.log(err.response.data?.error);
+
+        throw err;
+
       }finally{
           setLoading(false);
       }
@@ -307,7 +310,15 @@ const Register : React.FC<Props> = ({route}) => {
                 <Formik 
              initialValues={{...initialvalues, funcao: ''}}
              validationSchema={ Yup.object().shape(handleGetValidation())}
-                  onSubmit={values => console.log('teste')}>
+                  onSubmit={(values, actions) => handleSubmit(values).then(() => {
+                    actions.setSubmitting(false);
+                    actions.resetForm();
+                  }).catch((err) => {
+                    Alert.alert(
+                      'Erro no cadastro',
+                      err.response.data?.error || 'Ocorreu um erro ao fazer o cadastro, tente novamente.',
+                    );
+                  })}>
                       {({handleChange, handleSubmit, values, errors, touched}) => 
                       (
                         <>
@@ -315,13 +326,14 @@ const Register : React.FC<Props> = ({route}) => {
                         {/* {formErrors && (<View style={styles.containerError}>{formErrors.map((error, i) =>(<View style={{flexDirection: 'row'}} key={i} ><Feather name="alert-circle" size={16} color="#c53030" /><Text style={styles.textError}>
                               {error}</Text></View>))}</View>)} */}
 
-                          {!isPacient && (
+                          {(!isPacient) && (
                           <CustomPicker label="Função do usuário" 
                           options={funcoes} 
                           touched={touched.funcao} 
                           error={errors.funcao} 
                           onChange={handleChange('funcao')}
-                          onChangeState={(value) => setFuncao(value)} 
+                          onChangeState={(value) => setFuncao(value)}
+                          loading={!loadedFuncoes} 
                           value={values.funcao}  />)}
 
       
@@ -418,6 +430,7 @@ const Register : React.FC<Props> = ({route}) => {
                           ref={inputCns}
                           onChangeText={handleChange('cns')} 
                           returnKeyType="next"
+                          maxLength={6}
                           onSubmitEditing={() => inputCnes.current?.focus()}
                           />
 
@@ -426,7 +439,9 @@ const Register : React.FC<Props> = ({route}) => {
                           error={errors.cnes}
                           ref={inputCnes}
                           onChangeText={handleChange('cnes')} 
+                          keyboardType="numeric"
                           returnKeyType="next"
+                          maxLength={6}
                           onSubmitEditing={() => inputEstabelecimento.current?.focus()}
                           />
 

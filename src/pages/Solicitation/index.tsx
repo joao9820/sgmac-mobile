@@ -13,16 +13,13 @@ import { useAuth } from '../../contexts/auth';
 import CustomPicker from '../../components/CustomPicker';
 import Input from '../../components/Input';
 
-import {User} from '../../@types';
+import {Doenca, Medicamento, User, SolicitacaoMedicamentos as MedicamentoSelected} from '../../@types';
 import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
 import CheckBox from '@react-native-community/checkbox';
 import { Divider } from 'react-native-elements';
 import Button from '../../components/Button';
 
-interface Doenca {
-    id_doenca: number;
-    cid_10: string;
-    nome: string;
+interface DoencaSelect extends Doenca {
     id: string;
     name: string;
 }
@@ -33,22 +30,9 @@ interface Pacient {
     name: string
 }
 
-interface Medicamento {
-    id_medicamento: number;
-    nome: string;
+interface MedicamentoSelect extends Medicamento {
     id: string;
     name: string
-}
-
-interface MedicamentoSelected {
-    fk_medicamento_id: string;
-    quantidade: string;
-    mes1: boolean;
-    mes2: boolean;
-    mes3: boolean;
-    mes4: boolean;
-    mes5: boolean;
-    mes6: boolean;
 }
 
 interface FormData {
@@ -75,10 +59,10 @@ const Solicitation : React.FC = () => {
     const [pacientes, setPacientes] = useState<Pacient[]>([]);
 
     const [loadedMedicamentos, setLoadedMedicamentos] = useState(false);
-    const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
+    const [medicamentos, setMedicamentos] = useState<MedicamentoSelect[]>([]);
 
     const [loadedDoencas, setLoadedDoencas] = useState(false);
-    const [doencas, setDoencas] = useState<Doenca[]>([]);
+    const [doencas, setDoencas] = useState<DoencaSelect[]>([]);
 
     const [cid10, setCid10] = useState('');
 
@@ -127,7 +111,7 @@ const Solicitation : React.FC = () => {
 
             try{
 
-                const response = await api.get<Medicamento[]>('/medicines');
+                const response = await api.get<MedicamentoSelect[]>('/medicines');
                 
 
                 const {data} = response;
@@ -187,7 +171,7 @@ const Solicitation : React.FC = () => {
         setCid10(search);
         setLoadedDoencas(false);
 
-        api.get<Doenca[]>('/illnesses', {params: {
+        api.get<DoencaSelect[]>('/illnesses', {params: {
             search
         }}).then((response) => {
 
@@ -281,7 +265,7 @@ const Solicitation : React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Header pageName="Solicitações"/>
+            <Header pageName="Solicitações" previewScreen="Solicitations"/>
             <ScrollView>
                 <View style={styles.form}>
                 <Formik 
@@ -336,7 +320,7 @@ const Solicitation : React.FC = () => {
                                             onChange={(value) => setMedicamentoItemValue(index, 'fk_medicamento_id', value)}
                                             loading={!loadedMedicamentos}
                                             placeholder="Selecione o medicamento" 
-                                            value={med.fk_medicamento_id}  />
+                                            value={String(med.fk_medicamento_id)}  />
 
                                             <Input placeholder="Indique a quantidade" label="Quantidade"
                                                     value={med.quantidade}

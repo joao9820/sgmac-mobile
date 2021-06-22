@@ -50,19 +50,6 @@ export interface UserDefault {
   password_confirmation: string;
 }
 
-interface Pacient extends UserDefault {
-  peso: string;
-  tamanho: string;
-  nome_da_mae: string;
-  raca: string;
-}
-
-interface Doctor extends UserDefault {
-  cns: string;
-  cnes: string;
-  estabelecimento: string;
-}
-
 interface FormData {
   fk_funcao_id?: number;
   funcao?: string;

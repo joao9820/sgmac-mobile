@@ -6,10 +6,14 @@ import Register from '../pages/Register';
 
 import {Ionicons} from '@expo/vector-icons';
 import Solicitation from '../pages/Solicitation';
+import { useAuth } from '../contexts/auth';
+import ListSolicitations from '../pages/List Solicitations';
 
 const CustomNav = createBottomTabNavigator();
 
 function AppRoutesTabs(){
+
+    const {user} = useAuth();
 
     const activeColor = '#00305E';
 
@@ -51,8 +55,9 @@ function AppRoutesTabs(){
             }
         }} />
  */}
+ 
 
-        <CustomNav.Screen  name="Solicitations" component={Solicitation} options={{
+        <CustomNav.Screen  name="Solicitations" component={ListSolicitations} options={{
             tabBarLabel: 'Solicitações',
             tabBarIcon: ({color, size, focused}) => {
                 return (
@@ -61,15 +66,16 @@ function AppRoutesTabs(){
             }
         }} />
 
- 
-         <CustomNav.Screen name="Users" component={Users} options={{
+        {!!user && user.fk_funcao_id === 1 && ( <CustomNav.Screen name="Users" component={Users} options={{
             tabBarLabel: 'Usuários',
             tabBarIcon: ({color, size, focused}) => {
                 return (
                     <Ionicons name="ios-people" size={size} color={focused ? activeColor : color}/>
                 );
             }
-        }}  />
+        }}  />)}
+ 
+        
 
         <CustomNav.Screen name="Perfil" component={Register} options={{
             tabBarLabel: 'Perfil',

@@ -8,23 +8,11 @@ import {Avatar} from 'react-native-elements';
 import { BorderlessButton } from 'react-native-gesture-handler';
 
 import styles from './styles';
-
-interface Funcao {
-    id_funcao: number;
-    nome: string;
-}
-
-interface User {
-    id_usuario: number;
-    nome: string;
-    avatar?: string;
-    funcao: Funcao;
-}
+import { User } from '../../@types';
 
 interface Props {
     user: User;
 }
-
 
 const UserItem: React.FC<Props> = ({user}) => {
 
@@ -42,7 +30,7 @@ const UserItem: React.FC<Props> = ({user}) => {
 
                 <View style={styles.profileInfo}>
                     <Text style={styles.name}>{user.nome}</Text>
-                    <Text style={styles.subject}>{user.funcao.nome}</Text>
+                    <Text style={styles.subject}>{user.funcao?.nome}</Text>
                 </View>
             </View>
 

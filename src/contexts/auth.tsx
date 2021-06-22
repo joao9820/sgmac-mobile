@@ -8,7 +8,7 @@ interface User {
     email: string;
     nome: string;
     avatar?: string;
-    fk_usuario_id?: number;
+    id_usuario?: number;
 }
 
 interface AuthenticateUser {
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC = ({children}) => {
                 email: user.email,
                 nome: user.nome,
                 avatar: user.avatar,
-                fk_usuario_id: user.fk_usuario_id
+                id_usuario: user.id_usuario
             };
 
             //console.log(response.data);

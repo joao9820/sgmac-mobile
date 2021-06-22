@@ -16,6 +16,8 @@ import Input from '../../components/Input';
 import {User} from '../../@types';
 import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
 import CheckBox from '@react-native-community/checkbox';
+import { Divider } from 'react-native-elements';
+import Button from '../../components/Button';
 
 interface Doenca {
     id_doenca: number;
@@ -38,19 +40,36 @@ interface Medicamento {
     name: string
 }
 
+interface MedicamentoSelected {
+    fk_medicamento_id: string;
+    quantidade: string;
+    mes1: boolean;
+    mes2: boolean;
+    mes3: boolean;
+    mes4: boolean;
+    mes5: boolean;
+    mes6: boolean;
+}
+
 interface FormData {
-    medico: string,
     paciente: string,
     doenca: string,
     diagnostico: string,
     anamnese: string,
-    medicamentos: Array<{
-        fk_medicamento_id: string,
-        quantidade: string,
-    }>,
+}
+
+interface DataSolicitation {
+    fk_medico_id?: number;
+    fk_paciente_id: string;
+    fk_doenca_id: string;
+    medicamentos?: MedicamentoSelected[];
+    diagnostico: string;
+    anamnese: string;
 }
 
 const Solicitation : React.FC = () => {
+
+    const [loadingRegister, setLoadingRegister] = useState(false);
 
     const [loadedPacientes, setLoadedPacientes] = useState(false);
     const [pacientes, setPacientes] = useState<Pacient[]>([]);
@@ -58,24 +77,28 @@ const Solicitation : React.FC = () => {
     const [loadedMedicamentos, setLoadedMedicamentos] = useState(false);
     const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
 
-    const [medicamento, setMedicamento] = useState('');
-
     const [loadedDoencas, setLoadedDoencas] = useState(false);
     const [doencas, setDoencas] = useState<Doenca[]>([]);
 
     const [cid10, setCid10] = useState('');
 
-    const [medicamentoItem, setMedicamentoItem] = useState([{medicamento: '', meses: []}]);
+    const medicamentoItemDefault: MedicamentoSelected = {fk_medicamento_id: '', quantidade: '' ,mes1: true, 
+        mes2: false,
+        mes3: false,
+        mes4: false,
+        mes5: false,
+        mes6: false,
+    };
+
+    const [medicamentoItem, setMedicamentoItem] = useState<MedicamentoSelected[]>([medicamentoItemDefault]);
 
     const {user} = useAuth();
 
     const initialValues = {
-        medico: '',
         paciente: '',
         doenca: '',
         diagnostico: '',
         anamnese: '',
-        medicamentos: [],
     }
 
     const inputMedico = useRef<TextInput>(null);
@@ -86,17 +109,16 @@ const Solicitation : React.FC = () => {
 
     const validationSolicitacao = {
 
-        medico: Yup.string().required(''),
         paciente: Yup.string().required('Necessário selecionar um paciente'),
         doenca: Yup.string().required('Necessario selecionar a doença do paciente'),
         diagnostico: Yup.string().required('Necessário informar o diagnostico do paciente'),
         anamnese: Yup.string().required('Necessário informar a anamnese da doença do paciente'),
-        medicamentos: Yup.array(
+        /* medicamentos: Yup.array(
             Yup.object().shape({
                 fk_medicamento_id: Yup.string().required('Necessário selecionar o medicamento'),
                 quantidade: Yup.string().required('Necessário informar a quantidade do medicamento'),
             }),
-          ).required(),
+          ).required(), */
     }
 
     useEffect(() => {
@@ -192,12 +214,69 @@ const Solicitation : React.FC = () => {
 
     function handleAddMedicamento(){
 
-        setMedicamentoItem((state) => [...state, {medicamento: '', meses: []}]);
+        setMedicamentoItem((state) => [...state, medicamentoItemDefault]);
+
+    }
+
+    function setMedicamentoItemValue(position: number, field: string, value: string | boolean){
+
+        //field = week_day ou from ou to
+
+        //Criamos um novo array com as alterações
+
+        //console.log(medicamentoItem);
+
+        const updatedMedicamentoItems = medicamentoItem.map((medicamentoItem, index) => {
+
+            if(index === position){
+                /*Sem colcheltes o field seria o nome da propriedade e nao utiizaria o param que a função recebe
+                dessa forma o campo será sobrescrito com o valor que passamos após o spread operator*/
+                return {...medicamentoItem, [field]: value}; //retorna o objeto da posição equivalente
+            }
+
+            //Sem alteração de valores se não for a mesma posição que se quer alterar
+            return medicamentoItem;
+        });
+
+    
+       setMedicamentoItem(updatedMedicamentoItems);
 
     }
 
     async function handleSubmit(data: FormData){
-        console.log('solicitação submetida');
+        
+        setLoadingRegister(true);
+
+        //console.log(user);
+
+        try{
+
+            const dataSolicitation: DataSolicitation = {
+                fk_medico_id: user?.id_usuario,
+                fk_paciente_id: data.paciente,
+                fk_doenca_id: data.doenca,
+                medicamentos: medicamentoItem,
+                diagnostico: data.diagnostico,
+                anamnese: data.anamnese,                
+            }
+
+            await api.post('/solicitations', dataSolicitation);
+
+            Alert.alert(
+                'Solicitação realizada com sucesso!',
+                'Aguarde a resposta do autorizador. Boa sorte!',
+            );
+
+        }catch(err){
+
+            throw err;
+
+
+        }finally{
+            setLoadingRegister(false);
+        }
+
+
     }
 
     return (
@@ -211,17 +290,17 @@ const Solicitation : React.FC = () => {
                     onSubmit={(values, actions) => handleSubmit(values).then(() => {
                         actions.setSubmitting(false);
                         actions.resetForm();
+                        setMedicamentoItem([medicamentoItemDefault]);
                     }).catch((err) => {
                         Alert.alert(
                         'Erro ao registrar a solicitação',
                         err.response.data?.error || 'Ocorreu um erro ao registrar a solicitação, tente novamente.',
                         );
                     })}>
-                        {({handleChange, handleSubmit, values, errors, touched}) => 
+                        {({handleChange, handleSubmit, values, errors, touched, setFieldValue}) => 
                         (
                             <>
 
-                            
                             <CustomPicker label="Pacientes" 
                             options={pacientes} 
                             touched={touched.paciente} 
@@ -231,7 +310,7 @@ const Solicitation : React.FC = () => {
                             value={values.paciente}  />
 
                             <Input placeholder="CID-10 da doença" label="CID-10"
-                            onChangeText={value => handleFindDoenca(value)}
+                            onChangeText={value => value ? handleFindDoenca(value) : setFieldValue('doenca', '')}
                             maxLength={4}
                             />
 
@@ -245,28 +324,68 @@ const Solicitation : React.FC = () => {
                             enabled={!!cid10} 
                             value={values.doenca}  />
 
-                            {!!medicamentoItem.length && medicamentoItem.map((med, index) =>  (
-                              
-                                <View style={styles.medicamentoContainer} key={index}>
-                                     <CustomPicker label="Medicamentos" 
-                                        options={medicamentos} 
-                                        onChange={(value) => setMedicamento(value)}
-                                        loading={!loadedMedicamentos} 
-                                        value={medicamento}  />
-                                        <View style={styles.optionMes}>
-                                            <CheckBox value={true} tintColors={{true: '#0E89FC', false: '#E6E6F0'}} onValueChange={(value) => console.log('teste')} />
-                                            <Text>1</Text>
-                                        </View>
-                                         <RectButton style={styles.buttonAdd} onPress={handleAddMedicamento}>
-                                            <View style={styles.addMedicamento}>
-                                                <Text style={styles.addMedicamentoText}>Adicionar Medicamento</Text>
-                                                    <Feather name="plus-circle" size={22} color="green" />  
-                                            </View>
-                                        </RectButton>
-                                </View>
-                            
-                            ))}
+                            <Text style={styles.labelMedicamentos}>Medicamentos</Text>
+                            <View style={styles.medicamentoSection}>
+                                
+                                {!!medicamentoItem.length && medicamentoItem.map((med, index) =>  (
+                                
+                                    <View style={styles.medicamentoContainer} key={index}>
+                                        {index > 0 && <Divider orientation="horizontal" style={styles.divider} color='#FCFCFC' />}
+                                        <CustomPicker  
+                                            options={medicamentos} 
+                                            onChange={(value) => setMedicamentoItemValue(index, 'fk_medicamento_id', value)}
+                                            loading={!loadedMedicamentos}
+                                            placeholder="Selecione o medicamento" 
+                                            value={med.fk_medicamento_id}  />
 
+                                            <Input placeholder="Indique a quantidade" label="Quantidade"
+                                                    value={med.quantidade}
+                                                    onChangeText={value => setMedicamentoItemValue(index, 'quantidade', value)}
+                                                    keyboardType="numeric" />
+                                            <Text style={styles.label}>Meses</Text>
+                                            <View style={styles.optionMes}>
+                                                <View style={styles.mesItem}>
+                                                    <CheckBox value={med.mes1} tintColors={{true: '#E6E6F0', false: '#E6E6F0'}} 
+                                                    onValueChange={(value) => setMedicamentoItemValue(index, 'mes1', value)} disabled />
+                                                    <Text>1</Text>
+                                                </View>
+                                                <View style={styles.mesItem}>
+                                                    <CheckBox value={med.mes2} tintColors={{true: '#0E89FC', false: '#E6E6F0'}} 
+                                                    onValueChange={(value) => setMedicamentoItemValue(index, 'mes2', value)} />
+                                                    <Text>2</Text>
+                                                </View>
+                                                <View style={styles.mesItem}>
+                                                    <CheckBox value={med.mes3} tintColors={{true: '#0E89FC', false: '#E6E6F0'}} 
+                                                    onValueChange={(value) => setMedicamentoItemValue(index, 'mes3', value)} />
+                                                    <Text>3</Text>
+                                                </View>
+                                                <View style={styles.mesItem}>
+                                                    <CheckBox value={med.mes4} tintColors={{true: '#0E89FC', false: '#E6E6F0'}} 
+                                                    onValueChange={(value) => setMedicamentoItemValue(index, 'mes4', value)} />
+                                                    <Text>4</Text>
+                                                </View>
+                                                <View style={styles.mesItem}>
+                                                    <CheckBox value={med.mes5} tintColors={{true: '#0E89FC', false: '#E6E6F0'}} 
+                                                    onValueChange={(value) => setMedicamentoItemValue(index, 'mes5', value)} />
+                                                    <Text>5</Text>
+                                                </View>
+                                                <View style={styles.mesItem}>
+                                                    <CheckBox value={med.mes6} tintColors={{true: '#0E89FC', false: '#E6E6F0'}} 
+                                                    onValueChange={(value) => setMedicamentoItemValue(index, 'mes6', value)} />
+                                                    <Text>6</Text>
+                                                </View>
+                                            </View>
+                                            {index === medicamentoItem.length - 1 && (<RectButton style={styles.buttonAdd} onPress={handleAddMedicamento}>
+                                                <View style={styles.addMedicamento}>
+                                                    <Text style={styles.addMedicamentoText}>Adicionar Medicamento</Text>
+                                                        <Feather name="plus-circle" size={22} color="green" />  
+                                                </View>
+                                            </RectButton>)}
+                                            
+                                    </View>
+                                
+                                ))}
+                            </View>
                             <Input placeholder="Informe o diagnóstico" label="Diagnóstico" 
                             value={values.diagnostico}
                             touched={touched.diagnostico}
@@ -284,8 +403,10 @@ const Solicitation : React.FC = () => {
                             returnKeyType="next"
                             ref={inputAnamnese}
                             onChangeText={handleChange('anamnese')}
-                            onSubmitEditing={() => inputAnamnese.current?.focus()}
+                            onSubmitEditing={() => handleSubmit()}
                             />
+
+                            <Button title="Cadastrar" onPress={handleSubmit} loading={loadingRegister} />
 
                             </>
                         )}

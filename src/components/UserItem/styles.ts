@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
     name: {
         color: '#32264d',
         fontSize: 20,
-        marginTop: 4
+        marginTop: 4,
+        maxWidth: 180,
     },
 
     subject:{

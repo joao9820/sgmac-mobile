@@ -12,7 +12,7 @@ export interface Option {
 }
 
 interface Props {
-    label: string;
+    label?: string;
     options: Option[];
     placeholder?: string;
     enabled?: boolean;
@@ -44,7 +44,7 @@ onChangeState, loading = false, last = false}) => {
 
     return (
     <View style={[styles.container, {marginBottom: last ? 0 : 16 }]}>
-    <Text style={styles.label}>{label}</Text>
+    {label && (<Text style={styles.label}>{label}</Text>)}
         <View style={[styles.picker, {borderColor}]}>
           <Picker 
           selectedValue={value}

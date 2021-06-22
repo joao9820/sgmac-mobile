@@ -304,7 +304,7 @@ const Register : React.FC<Props> = ({route}) => {
     return (
         <View style={styles.container}>
 
-            <Header pageName={`Cadastrar ${isPacient ? ' Paciente' : 'Usuário'}`} previewScreen="Login" authPage={isPacient}/>
+            <Header pageName={`Cadastrar ${isPacient ? ' Paciente' : 'Usuário'}`} previewScreen={isPacient ? 'Login' : 'Users'} authPage={isPacient}/>
             <ScrollView contentContainerStyle={{}}>
                 <View style={styles.form}>
                 <Formik 

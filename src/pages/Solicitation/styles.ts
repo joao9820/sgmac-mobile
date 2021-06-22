@@ -60,7 +60,37 @@ const styles = StyleSheet.create({
     },
     optionMes: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10
+    },
+    mesItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    label: {
+        marginBottom: 4,
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#00305E'  
+    },
+    labelMedicamentos: {
+        marginBottom: 4,
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#00305E',
+        textAlign: 'center'
+    },
+    medicamentoSection: {
+        borderWidth:1,
+        padding: 8,
+        borderColor: '#FCFCFC',
+        borderRadius: 5,
+        marginBottom: 16,
+    },
+    divider: {
+        marginBottom: 10,
+        borderColor: '#FCFCFC',
     }
 });
 

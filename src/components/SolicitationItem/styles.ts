@@ -5,18 +5,20 @@ const styles = StyleSheet.create({
 
     container:{
         backgroundColor: '#FFF',
-        borderWidth: 1,
-        borderColor: '#e6e6f0',
         borderRadius: 8,
         marginBottom: 16,
+        marginHorizontal: 4,
         overflow: 'hidden'
     },
-
     profile:{
+        borderWidth: 1,
+        borderColor: '#3182CE',
+        borderBottomEndRadius: 8,
+        borderBottomStartRadius: 8,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 24,
+        padding: 16,
     },
     info: {
         flexDirection: 'row',
@@ -34,20 +36,16 @@ const styles = StyleSheet.create({
     },
 
     profileInfo:{
-        marginLeft: 16
+        
     },
-
-    name: {
-        color: '#32264d',
-        fontSize: 20,
-        marginTop: 4,
-        maxWidth: 180,
+    groupInfo: {
+        marginTop: 6,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-
     subject:{
         color: '#6a6180',
-        fontSize: 12,
-        marginTop: 4
+        fontSize: 14,
     },
 
     bio: {
@@ -108,11 +106,36 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 16
     },
-
     headerSolicitation: {
         flexDirection: 'row',
         flex: 1,
         justifyContent: 'space-between',
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#3182CE',
+    },
+    code: {
+        color: '#3182CE',
+        fontSize: 18,
+        fontWeight: '700',
+        marginTop: 4,
+        maxWidth: 180,
+    },
+    badgeStatus: {
+        padding: 4,
+        justifyContent: 'center',
+        borderRadius: 6,
+    },
+    badgeText: {
+        color: '#FFF',
+        fontWeight: '600',
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: 'black',
     }
 
 });

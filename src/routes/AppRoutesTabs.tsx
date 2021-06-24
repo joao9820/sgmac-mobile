@@ -77,14 +77,14 @@ function AppRoutesTabs(){
  
         
 
-        <CustomNav.Screen name="Perfil" component={Register} options={{
+        {/* <CustomNav.Screen name="Perfil" component={Register} options={{
             tabBarLabel: 'Perfil',
             tabBarIcon: ({color, size, focused}) => {
                 return (
                     <Ionicons name="ios-settings" size={size} color={focused ? activeColor : color}/>
                 );
             }
-        }}  />
+        }}  /> */}
 
     </CustomNav.Navigator>
 )

@@ -19,9 +19,11 @@ interface Props extends TextInputProps {
     touched?: boolean;
     onChangeText(text: string): void;
     useTrim?: boolean;
+    textArea ?: boolean;
     last?: boolean;
     pass?: boolean;
     mask?: 'none' | 'cpf'| 'decimal' | 'telefone';
+    height?: string | number;
 }
 
 
@@ -34,7 +36,8 @@ interface InputFocus {
     
 }
 
-const Input : React.ForwardRefRenderFunction<TextInput,Props> = ({placeholder ,value, last, pass, onChangeText, label, error, touched, useTrim = false ,mask = 'none',...rest}, ref) => {
+const Input : React.ForwardRefRenderFunction<TextInput,Props> = ({placeholder ,value, last, pass, onChangeText, label, error, touched, 
+    height, textArea = false, useTrim = false ,mask = 'none',...rest}, ref) => {
 
     const [viewPass, setViewPass] = useState(false);
     const [focusStyle, setFocusStyle] = useState<InputFocus | null>({} as InputFocus);
@@ -85,7 +88,7 @@ const Input : React.ForwardRefRenderFunction<TextInput,Props> = ({placeholder ,v
             {label && (<Text style={styles.label}>{label}</Text>)}
             <View>
             <TextInput secureTextEntry={!!pass && !viewPass} placeholder={placeholder} 
-                style={[styles.input, {borderColor: borderColor}]}
+                style={[styles.input, {borderColor: borderColor, height: height || 55, textAlignVertical: textArea ? 'top' : 'auto'}]}
                 onFocus={() => {setActive(true); !hasError && setBorderColor(activeColor)}} 
                 onBlur={() => {setActive(false); !hasError && setBorderColor(defaultColor)}}
                 value={value} onChangeText={text => handleCustomText(useTrim ? text.trim() : text)} ref={ref} {...rest} />

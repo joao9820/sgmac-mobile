@@ -372,6 +372,9 @@ const Solicitation : React.FC = () => {
                             </View>
                             <Input placeholder="Informe o diagnóstico" label="Diagnóstico" 
                             value={values.diagnostico}
+                            textArea
+                            numberOfLines={4}
+                            height={90}
                             touched={touched.diagnostico}
                             error={errors.diagnostico}
                             returnKeyType="next"
@@ -384,6 +387,9 @@ const Solicitation : React.FC = () => {
                             value={values.anamnese}
                             touched={touched.anamnese}
                             error={errors.anamnese}
+                            textArea
+                            numberOfLines={4}
+                            height={90}
                             returnKeyType="next"
                             ref={inputAnamnese}
                             onChangeText={handleChange('anamnese')}

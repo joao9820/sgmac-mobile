@@ -12,9 +12,10 @@ import { User } from '../../@types';
 
 interface Props {
     user: User;
+    onDelete(user: User): void;
 }
 
-const UserItem: React.FC<Props> = ({user}) => {
+const UserItem: React.FC<Props> = ({user, onDelete}) => {
 
     return (<View style={styles.container}>
         <View style={styles.profile}>
@@ -35,10 +36,10 @@ const UserItem: React.FC<Props> = ({user}) => {
             </View>
 
             <View style={styles.options}>
-                <BorderlessButton style={{marginRight: 8}}>
+                {/* <BorderlessButton style={{marginRight: 8}}>
                         <Feather name="edit" size={22} color="black" />
-                    </BorderlessButton>
-                <BorderlessButton>
+                    </BorderlessButton> */}
+                <BorderlessButton onPress={() => onDelete(user)}>
                     <Feather name="trash" size={22} color="black" />
                 </BorderlessButton>
             </View>

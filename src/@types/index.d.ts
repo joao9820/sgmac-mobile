@@ -91,6 +91,7 @@ export interface Solicitation {
     fk_doenca_id: number;
     fk_autorizador_id?: number;
     fk_status_id: number;
+    observacao ?: string;
     diagnostico: string;
     anamnese?: string;
     data_inicio?: string;
